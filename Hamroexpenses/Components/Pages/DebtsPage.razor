@@ -1,0 +1,128 @@
+@page "/dashboard/debts"
+@using Hamroexpenses.Services
+@using Hamroexpenses.Models
+@inject DebtService DebtService
+@inject IncomeService IncomeService
+@inject NavigationManager NavigationManager
+
+<head>
+    <link href="css/Debts.css" rel="stylesheet" />
+</head>
+
+<div class="debts-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>Hamro Expenses</h2>
+        </div>
+       <ul>
+            <li><NavLink href="/dashboard" class="nav-link" Match="NavLinkMatch.All">Home</NavLink></li>
+            <li><NavLink href="/dashboard/income" class="nav-link">Income</NavLink></li>
+            <li><NavLink href="/dashboard/expenses" class="nav-link">Expenses</NavLink></li>
+            <li><NavLink href="/dashboard/debts" class="nav-link">Debts</NavLink></li>
+            <li><NavLink href="/dashboard/clear-debts" class="nav-link">Clear Debts</NavLink></li> <!-- Add link for clearing debts -->
+            <li><NavLink href="/dashboard/transactions" class="nav-link">Transaction</NavLink></li>
+            <li><button class="btn logout-btn" @onclick="Logout">Logout</button></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content-area">
+        <h3>Debt Management</h3>
+        <p>Track and manage your debts, including clearing pending debts.</p>
+
+        <div class="debt-form">
+            <h4>Add New Debt</h4>
+            <div>
+                <label for="debt-description">Description</label>
+                <input id="debt-description" type="text" @bind="NewDebt.Description" placeholder="Enter description" />
+            </div>
+            <div>
+                <label for="debt-amount">Amount ($)</label>
+                <input id="debt-amount" type="number" @bind="NewDebt.Amount" placeholder="Enter amount" />
+            </div>
+            <div>
+                <label for="debt-category">Category</label>
+                <input id="debt-category" type="text" @bind="NewDebt.Category" placeholder="Enter category" />
+            </div>
+            <button class="add-debt-btn" @onclick="AddDebt">Add Debt</button>
+        </div>
+
+        <div class="debt-list">
+            <h4>Debts List</h4>
+            <ul>
+                @foreach (var debt in Debts)
+                {
+                        <li>
+                            <strong>@debt.Description:</strong> @debt.Amount.ToString("C") (Category: @debt.Category, Cleared: @(debt.IsCleared ? "Yes" : "No"))
+                        @if (!debt.IsCleared)
+                        {
+                                    <button @onclick="() => ClearDebt(debt.Id, debt.Amount)">Mark as Cleared</button>
+                        }
+                            <button @onclick="() => DeleteDebt(debt.Id)">Delete</button>
+                        </li>
+                }
+            </ul>
+        </div>
+
+        <div class="total-debt">
+            <h4>Total Outstanding Debt: <span>@TotalDebt.ToString("C")</span></h4>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<Debt> Debts = new();
+    private Debt NewDebt = new();
+    private decimal TotalDebt = 0;
+
+    protected override void OnInitialized()
+    {
+        Debts = DebtService.GetAllDebts();
+        CalculateTotalDebt();
+    }
+
+    private void AddDebt()
+    {
+        if (!string.IsNullOrEmpty(NewDebt.Description) && NewDebt.Amount > 0)
+        {
+            DebtService.AddDebt(NewDebt);
+            Debts = DebtService.GetAllDebts();
+            CalculateTotalDebt();
+            NewDebt = new();
+        }
+    }
+
+    private void ClearDebt(int id, decimal debtAmount)
+    {
+        var debt = Debts.FirstOrDefault(d => d.Id == id);
+        if (debt != null)
+        {
+            debt.IsCleared = true;
+            DebtService.UpdateDebt(debt);
+
+            // Deduct the cleared debt amount from the income
+            IncomeService.DeductIncome(debtAmount);
+
+            Debts = DebtService.GetAllDebts();
+            CalculateTotalDebt();
+        }
+    }
+
+    private void DeleteDebt(int id)
+    {
+        DebtService.DeleteDebt(id);
+        Debts = DebtService.GetAllDebts();
+        CalculateTotalDebt();
+    }
+
+    private void CalculateTotalDebt()
+    {
+        TotalDebt = Debts.Where(d => !d.IsCleared).Sum(d => d.Amount);
+    }
+
+    private void Logout()
+    {
+        NavigationManager.NavigateTo("/login");
+    }
+}

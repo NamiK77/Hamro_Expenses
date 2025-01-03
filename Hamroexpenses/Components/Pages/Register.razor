@@ -1,0 +1,61 @@
+@page "/register"
+@using Hamroexpenses.Services
+@using Hamroexpenses.Models
+@inject UserService UserService
+@inject NavigationManager NavigationManager
+
+<h3>Register</h3>
+
+<div>
+    <input @bind="RegisterUsername" placeholder="Username" />
+    <input @bind="RegisterPassword" placeholder="Password" type="password" />
+    <input @bind="RegisterEmail" placeholder="Email" />
+    <button @onclick="HandleRegister">Register</button>
+</div>
+
+@if (!string.IsNullOrEmpty(Message))
+{
+        <p>@Message</p>
+}
+
+@code {
+    private string RegisterUsername = "";
+    private string RegisterPassword = "";
+    private string RegisterEmail = "";
+    private string Message = "";
+
+    private List<User> Users = new();
+
+    protected override void OnInitialized()
+    {
+        Users = UserService.LoadUsers();  // Load users from the service
+    }
+
+    private void HandleRegister()
+    {
+        if (string.IsNullOrWhiteSpace(RegisterUsername) || string.IsNullOrWhiteSpace(RegisterPassword))
+        {
+            Message = "Username and password are required.";
+            return;
+        }
+
+        if (Users.Any(u => u.Username == RegisterUsername))
+        {
+            Message = "Username already exists.";
+            return;
+        }
+
+        var newUser = new User
+            {
+                Username = RegisterUsername,
+                Password = UserService.HashPassword(RegisterPassword),
+                Email = RegisterEmail
+            };
+
+        Users.Add(newUser);
+        UserService.SaveUsers(Users);
+
+        Message = "Registration successful. Redirecting to login...";
+        Task.Delay(2000).ContinueWith(_ => NavigationManager.NavigateTo("/login"));
+    }
+}

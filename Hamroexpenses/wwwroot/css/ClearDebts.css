@@ -1,0 +1,206 @@
+﻿/* Global Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f4f8;
+}
+
+/* Dashboard Container */
+.dashboard-container {
+    display: flex;
+    height: 100vh;
+    flex-direction: row;
+    box-sizing: border-box;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    width: 250px;
+    background: linear-gradient(to bottom, rgb(63, 94, 251), rgb(252, 70, 107));
+    padding: 20px;
+    color: white;
+    box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.sidebar-header h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #ffffff;
+    font-weight: bold;
+    text-align: center;
+}
+
+.sidebar ul {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 30px;
+}
+
+.sidebar li {
+    margin-bottom: 15px;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: white;
+    font-size: 1rem;
+    padding: 10px;
+    display: block;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+    .nav-link:hover {
+        background-color: rgb(252, 70, 107);
+    }
+
+/* Sidebar Buttons */
+.logout-btn {
+    width: 100%;
+    padding: 12px;
+    background: rgb(252, 70, 107);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    margin-top: 20px;
+}
+
+    .logout-btn:hover {
+        background: rgb(63, 94, 251);
+    }
+
+/* Main Content Area */
+.content-area {
+    flex: 1;
+    padding: 30px;
+    background-color: #ffffff;
+    box-shadow: -3px 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    margin-left: 20px;
+    overflow-y: auto; /* Prevent overflow when content is large */
+}
+
+    .content-area h3 {
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .content-area p {
+        font-size: 1.2rem;
+        color: #666;
+        margin-bottom: 40px;
+    }
+
+/* Pending Debts List */
+.pending-debts {
+    margin-top: 40px;
+}
+
+    .pending-debts ul {
+        list-style-type: none;
+        padding: 0;
+        margin-top: 20px;
+    }
+
+    .pending-debts li {
+        background-color: #f4f4f4;
+        padding: 12px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .pending-debts button {
+        background-color: rgb(63, 94, 251);
+        color: white;
+        padding: 8px 15px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        transition: background 0.3s ease;
+        margin-left: 10px;
+    }
+
+        .pending-debts button:hover {
+            background-color: rgb(252, 70, 107);
+        }
+
+/* Popup Styles */
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.popup-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.popup h4 {
+    font-size: 1.5rem;
+    color: rgb(252, 70, 107);
+    margin-bottom: 20px;
+}
+
+.popup p {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.popup button {
+    background-color: rgb(63, 94, 251);
+    color: white;
+    font-size: 1rem;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+    .popup button:hover {
+        background-color: rgb(252, 70, 107);
+    }
+
+/* Responsiveness */
+@media (max-width: 768px) {
+    .dashboard-container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        padding: 15px;
+    }
+
+    .content-area {
+        margin-left: 0;
+        padding: 20px;
+    }
+
+    .nav-link {
+        font-size: 0.9rem;
+    }
+}

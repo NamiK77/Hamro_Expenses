@@ -1,0 +1,63 @@
+﻿@page "/login"
+@using Hamroexpenses.Services
+@using Hamroexpenses.Models
+@inject UserService UserService
+@inject NavigationManager NavigationManager
+
+<!-- Include the external CSS file -->
+<head>
+    <link href="css/Login.css" rel="stylesheet" />
+</head>
+
+<div class="login-container">
+    <div class="login-box">
+        <h3 class="login-title">Login</h3>
+        <div class="login-inputs">
+            <input @bind="LoginUsername" class="input-field" placeholder="Username" />
+            <input @bind="LoginPassword" class="input-field" placeholder="Password" type="password" />
+        </div>
+        <button class="login-button" @onclick="PerformLogin">Login</button>
+
+        <!-- Register button that redirects to the Register page -->
+        <button class="register-button" @onclick="NavigateToRegister">Register</button>
+
+        @if (!string.IsNullOrEmpty(Message))
+        {
+            <p class="login-message">@Message</p>
+        }
+    </div>
+</div>
+
+@code {
+    private string LoginUsername = "";
+    private string LoginPassword = "";
+    private string Message = "";
+
+    private async Task PerformLogin()
+    {
+        // Validation for empty fields
+        if (string.IsNullOrWhiteSpace(LoginUsername) || string.IsNullOrWhiteSpace(LoginPassword))
+        {
+            Message = "Please enter both username and password.";
+            return;
+        }
+
+        // Simulated login service
+        if (UserService.Login(LoginUsername, LoginPassword))
+        {
+            Message = "Login successful. Redirecting to dashboard...";
+            await Task.Delay(2000);  // Allow the user to see the message
+            NavigationManager.NavigateTo("/dashboard");  // Redirect to the dashboard
+        }
+        else
+        {
+            Message = "Invalid username or password.";
+        }
+    }
+
+    // Method to navigate to the Register page
+    private void NavigateToRegister()
+    {
+        NavigationManager.NavigateTo("/register");  // Redirect to Register page
+    }
+}

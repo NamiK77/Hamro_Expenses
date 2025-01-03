@@ -1,0 +1,184 @@
+@page "/dashboard/transactions"
+@using Hamroexpenses.Services
+@using Hamroexpenses.Models
+@inject IncomeService IncomeService
+@inject ExpenseService ExpenseService
+@inject DebtService DebtService
+@inject NavigationManager NavigationManager
+
+<head>
+    <link href="css/Transaction.css" rel="stylesheet" />
+</head>
+
+<div class="transactions-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>Hamro Expenses</h2>
+        </div>
+        <ul>
+            <li><NavLink href="/dashboard" class="nav-link" Match="NavLinkMatch.All">Home</NavLink></li>
+            <li><NavLink href="/dashboard/income" class="nav-link">Income</NavLink></li>
+            <li><NavLink href="/dashboard/expenses" class="nav-link">Expenses</NavLink></li>
+            <li><NavLink href="/dashboard/debts" class="nav-link">Debts</NavLink></li>
+            <li><NavLink href="/dashboard/clear-debts" class="nav-link">Clear Debts</NavLink></li>
+            <li><NavLink href="/dashboard/transactions" class="nav-link">Transaction</NavLink></li>
+            <li><button class="btn logout-btn" @onclick="Logout">Logout</button></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <h3>Transactions</h3>
+        <p>View, filter, sort, and search your financial transactions.</p>
+
+        <!-- Dropdown to Select Data Type -->
+        <div class="filter-section">
+            <label for="data-type">Select Data Type:</label>
+            <select id="data-type" @onchange="LoadData">
+                <option value="">-- Select --</option>
+                <option value="Income">Income</option>
+                <option value="Expenses">Expenses</option>
+                <option value="Debts">Debts</option>
+            </select>
+
+            <!-- Search Bar -->
+            <input type="text" placeholder="Search by title..." @bind="SearchTerm" @oninput="ApplyFilters" />
+
+            <!-- Date Range Filter -->
+            <label for="start-date">Start Date:</label>
+            <input id="start-date" type="date" @bind="StartDate" />
+
+            <label for="end-date">End Date:</label>
+            <input id="end-date" type="date" @bind="EndDate" />
+
+            <!-- Sort Dropdown -->
+            <label for="sort-by">Sort By:</label>
+            <select id="sort-by" @onchange="SortData">
+                <option value="">-- Select --</option>
+                <option value="Date">Date</option>
+                <option value="Amount">Amount</option>
+                <option value="Category">Category</option>
+            </select>
+        </div>
+
+        <!-- Transactions List -->
+        <div class="transactions-list">
+            <h4>Filtered Transactions</h4>
+            <ul>
+                @foreach (var transaction in FilteredTransactions)
+                {
+                    <li>
+                        <strong>@transaction.Title:</strong> @transaction.Amount.ToString("C")
+                        (Category: @transaction.Category,
+                        @if (transaction.Date != null)
+                        {
+                            <text>Date: @transaction.Date.Value.ToShortDateString()</text>
+                        })
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<Transaction> AllTransactions = new();
+    private List<Transaction> FilteredTransactions = new();
+    private string SelectedType = string.Empty;
+    private string SearchTerm = string.Empty;
+    private string SortBy = string.Empty;
+    private DateTime? StartDate = null;
+    private DateTime? EndDate = null;
+
+    private void LoadData(ChangeEventArgs e)
+    {
+        SelectedType = e.Value?.ToString() ?? string.Empty;
+        AllTransactions.Clear();
+
+        // Fetch data based on the selected type
+        if (SelectedType == "Income")
+        {
+            AllTransactions = IncomeService.GetAllIncomes()
+                .Select(i => new Transaction
+                    {
+                        Title = i.Description ?? string.Empty,
+                        Amount = i.Amount,
+                        Category = i.Category ?? string.Empty,
+                        Date = i.Date,
+                        Tags = i.Tags ?? new List<string>(),
+                        Note = i.Note ?? string.Empty
+                    }).ToList();
+        }
+        else if (SelectedType == "Expenses")
+        {
+            AllTransactions = ExpenseService.GetAllExpenses()
+                .Select(e => new Transaction
+                    {
+                        Title = e.Description ?? string.Empty,
+                        Amount = e.Amount,
+                        Category = e.Category ?? string.Empty,
+                        Date = null, // No date for expenses
+                        Tags = e.Tags ?? new List<string>(),
+                        Note = e.Note ?? string.Empty
+                    }).ToList();
+        }
+        else if (SelectedType == "Debts")
+        {
+            AllTransactions = DebtService.GetAllDebts()
+                .Select(d => new Transaction
+                    {
+                        Title = d.Description ?? string.Empty,
+                        Amount = d.Amount,
+                        Category = d.Category ?? string.Empty,
+                        Date = d.Date,
+                        Tags = d.Tags ?? new List<string>(),
+                        Note = d.Note ?? string.Empty
+                    }).ToList();
+        }
+
+        ApplyFilters(); // Apply filters and sorting
+    }
+
+    private void ApplyFilters()
+    {
+        FilteredTransactions = AllTransactions
+            .Where(t => (string.IsNullOrEmpty(SearchTerm) || t.Title.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase))
+                        && (!StartDate.HasValue || t.Date >= StartDate)
+                        && (!EndDate.HasValue || t.Date <= EndDate))
+            .ToList();
+
+        SortData();
+    }
+
+    private void SortData(ChangeEventArgs e = null)
+    {
+        if (e != null)
+        {
+            SortBy = e.Value?.ToString() ?? string.Empty;
+        }
+
+        FilteredTransactions = SortBy switch
+        {
+            "Date" => FilteredTransactions.OrderBy(t => t.Date).ToList(),
+            "Amount" => FilteredTransactions.OrderBy(t => t.Amount).ToList(),
+            "Category" => FilteredTransactions.OrderBy(t => t.Category).ToList(),
+            _ => FilteredTransactions
+        };
+    }
+
+    private void Logout()
+    {
+        NavigationManager.NavigateTo("/login");
+    }
+
+    public class Transaction
+    {
+        public string Title { get; set; } = string.Empty;
+        public decimal Amount { get; set; }
+        public string Category { get; set; } = string.Empty;
+        public DateTime? Date { get; set; }
+        public List<string> Tags { get; set; } = new();  // Default empty list
+        public string Note { get; set; } = string.Empty;
+    }
+}

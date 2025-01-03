@@ -1,0 +1,84 @@
+﻿/* login.css */
+
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(to bottom right, rgb(63, 94, 251), rgb(252, 70, 107));
+    font-family: Arial, sans-serif;
+}
+
+.login-box {
+    background: white;
+    padding: 20px 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.login-title {
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    color: rgb(63, 94, 251);
+}
+
+.login-inputs {
+    margin-bottom: 15px;
+}
+
+.input-field {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid rgb(200, 200, 200);
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+    .input-field:focus {
+        border-color: rgb(63, 94, 251);
+        outline: none;
+    }
+
+.login-button {
+    width: 100%;
+    padding: 10px;
+    background: rgb(252, 70, 107);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+    .login-button:hover {
+        background: rgb(63, 94, 251);
+    }
+
+.login-message {
+    margin-top: 10px;
+    color: rgb(252, 70, 107);
+    font-weight: bold;
+}
+
+
+/* Add styles for the Register button */
+.register-button {
+    width: 100%;
+    padding: 10px;
+    background: rgb(63, 94, 251);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.3s;
+}
+
+    .register-button:hover {
+        background: rgb(252, 70, 107);
+    }

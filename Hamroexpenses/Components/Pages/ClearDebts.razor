@@ -1,0 +1,116 @@
+@page "/dashboard/clear-debts"
+@using Hamroexpenses.Services
+@using Hamroexpenses.Models
+@inject DebtService DebtService
+@inject IncomeService IncomeService
+@inject NavigationManager NavigationManager
+
+<head>
+    <link href="css/ClearDebts.css" rel="stylesheet" />
+</head>
+
+<div class="dashboard-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>Hamro Expenses</h2>
+        </div>
+        <ul>
+            <li><NavLink href="/dashboard" class="nav-link" Match="NavLinkMatch.All">Home</NavLink></li>
+            <li><NavLink href="/dashboard/income" class="nav-link">Income</NavLink></li>
+            <li><NavLink href="/dashboard/expenses" class="nav-link">Expenses</NavLink></li>
+            <li><NavLink href="/dashboard/debts" class="nav-link">Debts</NavLink></li>
+            <li><NavLink href="/dashboard/clear-debts" class="nav-link">Clear Debts</NavLink></li> <!-- Add link for clearing debts -->
+            <li><NavLink href="/dashboard/transactions" class="nav-link">Transaction</NavLink></li>
+            <li><button class="btn logout-btn" @onclick="Logout">Logout</button></li>
+        </ul>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="content-area">
+        <h3>Clear Debts</h3>
+        <p>Here, you can clear your pending debts.</p>
+
+        <div class="pending-debts">
+            <h4>Pending Debts</h4>
+            @if (PendingDebts.Any())
+            {
+                <ul>
+                    @foreach (var debt in PendingDebts)
+                    {
+                        <li>
+                            <strong>@debt.Description</strong> - @debt.Amount.ToString("C")
+                            <button @onclick="() => ClearDebt(debt.Id)">Clear Debt</button>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p>No pending debts found!</p>
+            }
+        </div>
+
+        <!-- Confirmation Popup -->
+        @if (ShowDebtClearedPopup)
+        {
+            <div class="popup">
+                <div class="popup-content">
+                    <h4>Debt Cleared Successfully!</h4>
+                    <p>Your debt has been cleared successfully.</p>
+                    <button @onclick="CloseDebtPopup">Close</button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private List<Debt> PendingDebts = new();
+    private bool ShowDebtClearedPopup = false;
+
+    protected override void OnInitialized()
+    {
+        // Load pending debts on initialization
+        PendingDebts = DebtService.GetAllDebts().Where(d => !d.IsCleared).ToList();
+    }
+
+    private void ClearDebt(int debtId)
+    {
+        // Find the debt and mark it as cleared
+        var debtToClear = PendingDebts.FirstOrDefault(d => d.Id == debtId);
+
+        if (debtToClear != null)
+        {
+            // Call DebtService to clear the debt
+            debtToClear.IsCleared = true;
+            DebtService.UpdateDebt(debtToClear);
+
+            // Update income by deducting the debt amount
+            var income = IncomeService.GetAllIncomes().FirstOrDefault();
+            if (income != null)
+            {
+                income.Amount -= debtToClear.Amount;
+                IncomeService.UpdateIncome(income);
+            }
+
+            // Refresh the list of pending debts
+            PendingDebts = DebtService.GetAllDebts().Where(d => !d.IsCleared).ToList();
+
+            // Show the popup confirmation
+            ShowDebtClearedPopup = true;
+        }
+    }
+
+    private void CloseDebtPopup()
+    {
+        ShowDebtClearedPopup = false;
+        NavigationManager.NavigateTo("/dashboard/income"); // Navigate back to income page after closing popup
+    }
+
+    private void Logout()
+    {
+        // Handle logout
+        NavigationManager.NavigateTo("/login");
+    }
+}

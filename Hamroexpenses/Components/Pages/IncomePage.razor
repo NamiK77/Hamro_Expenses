@@ -1,0 +1,149 @@
+@page "/dashboard/income"
+@using Hamroexpenses.Services
+@using Hamroexpenses.Models
+@inject IncomeService IncomeService
+@inject DebtService DebtService
+@inject UserService UserService
+@inject NavigationManager NavigationManager
+
+<head>
+    <link href="css/Income.css" rel="stylesheet" />
+</head>
+
+<div class="dashboard-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>Hamro Expenses</h2>
+        </div>
+        <ul>
+            <li><NavLink href="/dashboard" class="nav-link" Match="NavLinkMatch.All">Home</NavLink></li>
+            <li><NavLink href="/dashboard/income" class="nav-link">Income</NavLink></li>
+            <li><NavLink href="/dashboard/expenses" class="nav-link">Expenses</NavLink></li>
+            <li><NavLink href="/dashboard/debts" class="nav-link">Debts</NavLink></li>
+            <li><NavLink href="/dashboard/clear-debts" class="nav-link">Clear Debts</NavLink></li> <!-- Add link for clearing debts -->
+            <li><NavLink href="/dashboard/transactions" class="nav-link">Transaction</NavLink></li>
+            <li><button class="btn logout-btn" @onclick="Logout">Logout</button></li>
+        </ul>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="content-area">
+        <h3>Income Management</h3>
+        <p>Track and manage your income by adding descriptions, dates, amounts, and categories.</p>
+
+        <div class="income-form">
+            <h4>Add New Income</h4>
+            <div>
+                <label for="income-description">Description</label>
+                <input id="income-description" type="text" @bind="NewIncome.Description" placeholder="Enter description" />
+            </div>
+            <div>
+                <label for="income-amount">Amount ($)</label>
+                <input id="income-amount" type="number" @bind="NewIncome.Amount" placeholder="Enter amount" />
+            </div>
+            <div>
+                <label for="income-date">Date</label>
+                <input id="income-date" type="date" @bind="NewIncome.Date" />
+            </div>
+            <div>
+                <label for="income-category">Category</label>
+                <input id="income-category" type="text" @bind="NewIncome.Category" placeholder="Enter category" />
+            </div>
+            <button class="add-income-btn" @onclick="AddIncome">Add Income</button>
+        </div>
+
+        <div class="income-summary">
+            <h4>Total Income: <span>@TotalIncome.ToString("C")</span></h4>
+        </div>
+
+        <div class="income-list">
+            <h4>Income Entries</h4>
+            <ul>
+                @foreach (var income in Incomes)
+                {
+                        <li>
+                            <strong>@income.Description:</strong> @income.Amount.ToString("C") on @income.Date.ToShortDateString()
+                            <span>(Category: @income.Category)</span>
+                            <button @onclick="() => DeleteIncome(income.Id)">Delete</button>
+                        </li>
+                }
+            </ul>
+        </div>
+
+        <!-- Clear Debts Button -->
+        <div class="clear-debts-section">
+            <h4>Clear Debts</h4>
+            <button class="clear-debt-btn" @onclick="NavigateToClearDebtsPage">Clear Debts</button>
+        </div>
+    </div>
+</div>
+
+<!-- Popup for Debt Cleared Confirmation -->
+@if (ShowDebtClearedPopup)
+{
+        <div class="popup">
+            <div class="popup-content">
+                <h4>Debt Cleared Successfully!</h4>
+                <p>Your debt has been cleared successfully.</p>
+                <button @onclick="CloseDebtPopup">Close</button>
+            </div>
+        </div>
+}
+
+@code {
+    private List<Income> Incomes = new();
+    private Income NewIncome = new() { Date = DateTime.Now };
+    private decimal TotalIncome = 0;
+    private bool ShowDebtClearedPopup = false;
+
+    // Debt model
+    private Debt Debt = new();
+
+    protected override void OnInitialized()
+    {
+        // Load income data on initialization
+        Incomes = IncomeService.GetAllIncomes();
+        CalculateTotalIncome();
+    }
+
+    private void CalculateTotalIncome()
+    {
+        TotalIncome = Incomes.Sum(i => i.Amount);
+    }
+
+    private void AddIncome()
+    {
+        if (!string.IsNullOrEmpty(NewIncome.Description) && NewIncome.Amount > 0 && !string.IsNullOrEmpty(NewIncome.Category))
+        {
+            IncomeService.AddIncome(NewIncome);
+            Incomes = IncomeService.GetAllIncomes();
+            CalculateTotalIncome();
+            NewIncome = new() { Date = DateTime.Now }; // Reset the form
+        }
+    }
+
+    private void DeleteIncome(int id)
+    {
+        IncomeService.DeleteIncome(id);
+        Incomes = IncomeService.GetAllIncomes();
+        CalculateTotalIncome();
+    }
+
+    private void NavigateToClearDebtsPage()
+    {
+        // Navigate to the Clear Debts page
+        NavigationManager.NavigateTo("/dashboard/clear-debts");
+    }
+
+    private void CloseDebtPopup()
+    {
+        ShowDebtClearedPopup = false;
+    }
+
+    private void Logout()
+    {
+        UserService.Logout(); // Clear the current user
+        NavigationManager.NavigateTo("/login"); // Redirect to login page
+    }
+}

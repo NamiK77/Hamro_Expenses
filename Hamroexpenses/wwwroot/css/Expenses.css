@@ -1,0 +1,263 @@
+﻿/* Global Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f4f8;
+}
+
+/* Dashboard Container */
+.dashboard-container {
+    display: flex;
+    height: 100vh;
+    flex-direction: row;
+    box-sizing: border-box;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    width: 250px;
+    background: linear-gradient(to bottom, rgb(63, 94, 251), rgb(252, 70, 107));
+    padding: 20px;
+    color: white;
+    box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.sidebar-header h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #ffffff;
+    font-weight: bold;
+    text-align: center;
+}
+
+.sidebar ul {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 30px;
+}
+
+.sidebar li {
+    margin-bottom: 15px;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: white;
+    font-size: 1rem;
+    padding: 10px;
+    display: block;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+    .nav-link:hover {
+        background-color: rgb(252, 70, 107);
+    }
+
+/* Sidebar Buttons */
+.logout-btn {
+    width: 100%;
+    padding: 12px;
+    background: rgb(252, 70, 107);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    margin-top: 20px;
+}
+
+    .logout-btn:hover {
+        background: rgb(63, 94, 251);
+    }
+
+/* Main Content Area */
+.content-area {
+    flex: 1;
+    padding: 30px;
+    background-color: #ffffff;
+    box-shadow: -3px 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    margin-left: 20px;
+}
+
+    .content-area h3 {
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .content-area p {
+        font-size: 1.2rem;
+        color: #666;
+        margin-bottom: 40px;
+    }
+
+/* Summary Boxes */
+.summary-boxes {
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+    margin-top: 40px;
+}
+
+.box {
+    background-color: #f4f4f4;
+    padding: 20px;
+    border-radius: 10px;
+    width: 45%;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+    .box h4 {
+        font-size: 1.5rem;
+        color: #333;
+    }
+
+    .box p {
+        font-size: 2rem;
+        font-weight: bold;
+        color: rgb(63, 94, 251);
+    }
+
+/* Expense Form */
+.expense-form {
+    margin-top: 40px;
+}
+
+    .expense-form h4 {
+        font-size: 2rem;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .expense-form div {
+        margin-bottom: 20px;
+    }
+
+    .expense-form label {
+        font-size: 1rem;
+        color: #666;
+        margin-bottom: 8px;
+        display: inline-block;
+    }
+
+    .expense-form input {
+        width: 100%;
+        padding: 10px;
+        font-size: 1rem;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+        transition: border 0.3s ease;
+    }
+
+        .expense-form input:focus {
+            border-color: rgb(63, 94, 251);
+            outline: none;
+        }
+
+    .expense-form button {
+        background-color: rgb(63, 94, 251);
+        color: white;
+        font-size: 1.2rem;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        width: 100%;
+    }
+
+        .expense-form button:hover {
+            background-color: rgb(252, 70, 107);
+        }
+
+/* Insufficient Funds Popup */
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.popup-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.popup h4 {
+    font-size: 1.5rem;
+    color: rgb(252, 70, 107);
+    margin-bottom: 20px;
+}
+
+.popup p {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.popup button {
+    background-color: rgb(63, 94, 251);
+    color: white;
+    font-size: 1rem;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+    .popup button:hover {
+        background-color: rgb(252, 70, 107);
+    }
+
+/* Expense List */
+.expense-list {
+    margin-top: 40px;
+}
+
+    .expense-list ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .expense-list li {
+        font-size: 1.2rem;
+        color: #333;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .expense-list button {
+        background-color: rgb(252, 70, 107);
+        color: white;
+        padding: 6px 12px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+        .expense-list button:hover {
+            background-color: rgb(63, 94, 251);
+        }

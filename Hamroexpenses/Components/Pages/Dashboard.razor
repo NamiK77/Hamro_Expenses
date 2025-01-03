@@ -1,0 +1,99 @@
+@page "/dashboard"
+@using Hamroexpenses.Services
+@using Hamroexpenses.Models
+@inject UserService UserService
+@inject IncomeService IncomeService
+@inject ExpenseService ExpenseService
+@inject DebtService DebtService
+@inject NavigationManager NavigationManager
+
+<head>
+    <link href="css/Dashboard.css" rel="stylesheet" />
+</head>
+
+<div class="dashboard-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>Hamro Expenses</h2>
+        </div>
+        <ul>
+            <li><NavLink href="/dashboard" class="nav-link" Match="NavLinkMatch.All">Home</NavLink></li>
+            <li><NavLink href="/dashboard/income" class="nav-link">Income</NavLink></li>
+            <li><NavLink href="/dashboard/expenses" class="nav-link">Expenses</NavLink></li>
+            <li><NavLink href="/dashboard/debts" class="nav-link">Debts</NavLink></li>
+            <li><NavLink href="/dashboard/clear-debts" class="nav-link">Clear Debts</NavLink></li> <!-- Add link for clearing debts -->
+            <li><NavLink href="/dashboard/transactions" class="nav-link">Transaction</NavLink></li>
+            <li><button class="btn logout-btn" @onclick="Logout">Logout</button></li>
+        </ul>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="content-area">
+        <h3>Welcome to Your Dashboard</h3>
+        <p>Manage your income, expenses, debts, and view financial reports. Use the sidebar to navigate.</p>
+
+        <div class="dashboard-cards">
+            <div class="card">
+                <h4>Total Income</h4>
+                <p>@TotalIncome.ToString("C")</p>
+            </div>
+            <div class="card">
+                <h4>Total Expenses</h4>
+                <p>@TotalExpenses.ToString("C")</p>
+            </div>
+            <div class="card">
+                <h4>Remaining Balance</h4>
+                <p>@RemainingBalance.ToString("C")</p>
+            </div>
+            <div class="card">
+                <h4>Total Debt</h4>
+                <p>@TotalDebt.ToString("C")</p>
+            </div>
+            <div class="card">
+                <h4>Pending Debt</h4>
+                <p>@PendingDebt.ToString("C")</p>
+            </div>
+            <div class="card">
+                <h4>Cleared Debt</h4>
+                <p>@ClearedDebt.ToString("C")</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private decimal TotalIncome = 0;
+    private decimal TotalExpenses = 0;
+    private decimal RemainingBalance = 0;
+    private decimal TotalDebt = 0;
+    private decimal PendingDebt = 0;
+    private decimal ClearedDebt = 0;
+
+    protected override void OnInitialized()
+    {
+        try
+        {
+            // Load financial data on initialization
+            TotalIncome = IncomeService.GetAllIncomes().Sum(i => i.Amount);
+            TotalExpenses = ExpenseService.GetAllExpenses().Sum(e => e.Amount);
+
+            var debts = DebtService.GetAllDebts();
+            TotalDebt = debts.Sum(d => d.Amount);
+            PendingDebt = debts.Where(d => !d.IsCleared).Sum(d => d.Amount);
+            ClearedDebt = debts.Where(d => d.IsCleared).Sum(d => d.Amount);
+
+            RemainingBalance = TotalIncome - (TotalExpenses + PendingDebt);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    private void Logout()
+    {
+        UserService.Logout();  // Clear the current user
+        NavigationManager.NavigateTo("/login");  // Redirect to login page
+    }
+}
