@@ -1,7 +1,4 @@
-﻿Sure, I can help you style your transaction page to match the provided CSS reference. Here's the updated CSS for your transaction page:
-
-```css
-/* Global Styles */
+﻿/* Global Styles */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -104,7 +101,7 @@ body {
 /* Filter Section */
 .filter-section {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
     gap: 10px;
     margin-bottom: 20px;
 }
@@ -161,6 +158,44 @@ body {
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
-```
+/* Table styles */
+.transactions-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
 
-This CSS should give your transaction page a similar look and feel to the reference you provided. Let me know if you need any further adjustments!
+    .transactions-table thead {
+        background-color: #34495e;
+        color: #ecf0f1;
+    }
+
+    .transactions-table th,
+    .transactions-table td {
+        padding: 12px 15px;
+        text-align: left;
+        border: 1px solid #ddd;
+    }
+
+    .transactions-table th {
+        font-size: 16px;
+        text-transform: uppercase;
+    }
+
+    .transactions-table tbody tr {
+        background-color: #f9f9f9;
+        transition: background-color 0.3s;
+    }
+
+        .transactions-table tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+    .transactions-table tbody td {
+        font-size: 14px;
+        color: #2c3e50;
+    }

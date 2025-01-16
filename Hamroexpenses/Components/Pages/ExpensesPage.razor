@@ -16,12 +16,12 @@
         <div class="sidebar-header">
             <h2>Hamro Expenses</h2>
         </div>
-       <ul>
+        <ul>
             <li><NavLink href="/dashboard" class="nav-link" Match="NavLinkMatch.All">Home</NavLink></li>
             <li><NavLink href="/dashboard/income" class="nav-link">Income</NavLink></li>
             <li><NavLink href="/dashboard/expenses" class="nav-link">Expenses</NavLink></li>
             <li><NavLink href="/dashboard/debts" class="nav-link">Debts</NavLink></li>
-            <li><NavLink href="/dashboard/clear-debts" class="nav-link">Clear Debts</NavLink></li> <!-- Add link for clearing debts -->
+            <li><NavLink href="/dashboard/clear-debts" class="nav-link">Clear Debts</NavLink></li>
             <li><NavLink href="/dashboard/transactions" class="nav-link">Transaction</NavLink></li>
             <li><button class="btn logout-btn" @onclick="Logout">Logout</button></li>
         </ul>
@@ -30,13 +30,13 @@
     <!-- Main Content Area -->
     <div class="content-area">
         <h3>Expenses Management</h3>
-        <p>Track and manage your expenses while keeping track of your total income.</p>
+        <p>Track and manage your expenses while keeping track of your total income and remaining balance.</p>
 
-        <!-- Total Income and Total Expenses Boxes -->
+        <!-- Total Balance and Total Expenses Boxes -->
         <div class="summary-boxes">
             <div class="box total-income-box" style="background: rgb(255, 105, 180);">
-                <h4>Total Income</h4>
-                <p>@TotalIncome.ToString("C")</p>
+                <h4>Remaining Balance</h4>
+                <p>@RemainingBalance.ToString("C")</p>
             </div>
             <div class="box total-expenses-box" style="background: rgb(0, 204, 255);">
                 <h4>Total Expenses</h4>
@@ -59,53 +59,90 @@
                 <label for="expense-category">Category</label>
                 <input id="expense-category" type="text" @bind="NewExpense.Category" placeholder="Enter category" />
             </div>
+            <div>
+                <label for="expense-date">Date</label>
+                <input id="expense-date" type="date" @bind="NewExpense.Date" />
+            </div>
+            <div>
+                <label for="expense-tags">Tags (comma-separated)</label>
+                <input id="expense-tags" type="text" @bind="TagsInput" placeholder="Enter tags" />
+            </div>
+            <div>
+                <label for="expense-note">Note</label>
+                <input id="expense-note" type="text" @bind="NewExpense.Note" placeholder="Enter a note" />
+            </div>
             <button class="add-expense-btn" @onclick="CheckAndAddExpense">Add Expense</button>
         </div>
-
-        <!-- Insufficient Funds Popup -->
-        @if (ShowInsufficientFundsPopup)
-        {
-            <div class="popup">
-                <div class="popup-content">
-                    <h4>You don't have enough money!</h4>
-                    <p>Your balance is insufficient to add this expense.</p>
-                    <button class="btn" @onclick="GoToDebtPage">Go to Debt Page</button>
-                    <button class="btn" @onclick="ClosePopup">Close</button>
-                </div>
-            </div>
-        }
 
         <!-- Expenses List -->
         <div class="expense-list">
             <h4>Expense Entries</h4>
-            <ul>
-                @foreach (var expense in Expenses)
-                {
-                    <li>
-                        <strong>@expense.Description:</strong> @expense.Amount.ToString("C") (Category: @expense.Category)
-                        <button @onclick="() => DeleteExpense(expense.Id)">Delete</button>
-                    </li>
-                }
-            </ul>
+            <table class="expenses-table">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Amount</th>
+                        <th>Category</th>
+                        <th>Date</th>
+                        <th>Tags</th>
+                        <th>Note</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var expense in Expenses)
+                    {
+                        <tr>
+                            <td>@expense.Description</td>
+                            <td>@expense.Amount.ToString("C")</td>
+                            <td>@expense.Category</td>
+                            <td>@expense.Date.ToString("yyyy-MM-dd")</td>
+                            <td>@string.Join(", ", expense.Tags)</td>
+                            <td>@expense.Note</td>
+                            <td>
+                                <button @onclick="() => DeleteExpense(expense.Id)">Delete</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
+
+    <!-- Insufficient Funds Popup -->
+    @if (ShowInsufficientFundsPopup)
+    {
+        <div class="popup">
+            <div class="popup-content">
+                <h4>You don't have enough money!</h4>
+                <p>Your balance is insufficient to add this expense.</p>
+                <button class="btn" @onclick="GoToDebtPage">Go to Debt Page</button>
+                <button class="btn" @onclick="ClosePopup">Close</button>
+            </div>
+        </div>
+    }
 </div>
 
 @code {
     private List<Expense> Expenses = new();
-    private Expense NewExpense = new();
+    private Expense NewExpense = new() { Date = DateTime.Now }; // Initialize with today's date
     private decimal TotalIncome = 0;
     private decimal TotalExpenses = 0;
+    private decimal RemainingBalance = 0;
     private bool ShowInsufficientFundsPopup = false;
+    private string TagsInput = string.Empty;
 
     protected override void OnInitialized()
     {
         try
         {
-            // Load expenses and income data on initialization
-            Expenses = ExpenseService.GetAllExpenses() ?? new List<Expense>();
-            TotalIncome = IncomeService.GetAllIncomes().Sum(i => i.Amount);
-            CalculateTotalExpenses();
+            var incomes = IncomeService.GetAllIncomes();
+            var expenses = ExpenseService.GetAllExpenses();
+
+            TotalIncome = incomes.Sum(i => i.Amount);
+            Expenses = expenses ?? new List<Expense>();
+            TotalExpenses = Expenses.Sum(e => e.Amount);
+            RemainingBalance = TotalIncome - TotalExpenses;
         }
         catch (Exception ex)
         {
@@ -113,17 +150,9 @@
         }
     }
 
-    private void CalculateTotalExpenses()
-    {
-        TotalExpenses = Expenses.Sum(e => e.Amount);
-    }
-
     private void CheckAndAddExpense()
     {
-        decimal availableBalance = TotalIncome - TotalExpenses;
-
-        // If there's not enough balance, show a pop-up
-        if (availableBalance < NewExpense.Amount)
+        if (RemainingBalance < NewExpense.Amount)
         {
             ShowInsufficientFundsPopup = true;
         }
@@ -143,14 +172,13 @@
                 return;
             }
 
-            // Deduct the expense amount from total income
-            TotalIncome -= NewExpense.Amount;
-
-            // Add the expense
+            NewExpense.Tags = TagsInput.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(t => t.Trim()).ToList();
             ExpenseService.AddExpense(NewExpense);
             Expenses = ExpenseService.GetAllExpenses();
-            CalculateTotalExpenses();
-            NewExpense = new Expense(); // Reset the form after adding
+            TotalExpenses = Expenses.Sum(e => e.Amount);
+            RemainingBalance = TotalIncome - TotalExpenses;
+            NewExpense = new Expense() { Date = DateTime.Now }; // Reset the form
+            TagsInput = string.Empty;
         }
         catch (Exception ex)
         {
@@ -162,15 +190,10 @@
     {
         try
         {
-            var expenseToDelete = Expenses.FirstOrDefault(e => e.Id == id);
-            if (expenseToDelete != null)
-            {
-                // Add the deleted expense amount back to the total income
-                TotalIncome += expenseToDelete.Amount;
-                ExpenseService.DeleteExpense(id);
-                Expenses = ExpenseService.GetAllExpenses();
-                CalculateTotalExpenses();
-            }
+            ExpenseService.DeleteExpense(id);
+            Expenses = ExpenseService.GetAllExpenses();
+            TotalExpenses = Expenses.Sum(e => e.Amount);
+            RemainingBalance = TotalIncome - TotalExpenses;
         }
         catch (Exception ex)
         {
@@ -178,19 +201,19 @@
         }
     }
 
-    private void ClosePopup()
+    private void Logout()
     {
-        ShowInsufficientFundsPopup = false;
+        UserService.Logout();
+        NavigationManager.NavigateTo("/");
     }
 
     private void GoToDebtPage()
     {
-        NavigationManager.NavigateTo("/dashboard/debts"); // Redirect to the debts page
+        NavigationManager.NavigateTo("/dashboard/debts");
     }
 
-    private void Logout()
+    private void ClosePopup()
     {
-        UserService.Logout(); // Clear the current user
-        NavigationManager.NavigateTo("/login"); // Redirect to login page
+        ShowInsufficientFundsPopup = false;
     }
 }

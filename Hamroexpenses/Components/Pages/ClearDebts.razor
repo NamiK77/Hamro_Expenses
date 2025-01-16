@@ -20,7 +20,7 @@
             <li><NavLink href="/dashboard/income" class="nav-link">Income</NavLink></li>
             <li><NavLink href="/dashboard/expenses" class="nav-link">Expenses</NavLink></li>
             <li><NavLink href="/dashboard/debts" class="nav-link">Debts</NavLink></li>
-            <li><NavLink href="/dashboard/clear-debts" class="nav-link">Clear Debts</NavLink></li> <!-- Add link for clearing debts -->
+            <li><NavLink href="/dashboard/clear-debts" class="nav-link">Clear Debts</NavLink></li>
             <li><NavLink href="/dashboard/transactions" class="nav-link">Transaction</NavLink></li>
             <li><button class="btn logout-btn" @onclick="Logout">Logout</button></li>
         </ul>
@@ -35,15 +35,29 @@
             <h4>Pending Debts</h4>
             @if (PendingDebts.Any())
             {
-                <ul>
-                    @foreach (var debt in PendingDebts)
-                    {
-                        <li>
-                            <strong>@debt.Description</strong> - @debt.Amount.ToString("C")
-                            <button @onclick="() => ClearDebt(debt.Id)">Clear Debt</button>
-                        </li>
-                    }
-                </ul>
+                <table class="debts-table">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var debt in PendingDebts)
+                        {
+                            <tr>
+                                <td>@debt.Description</td>
+                                <td>@debt.Amount.ToString("C")</td>
+                                <td>@debt.Date.ToShortDateString()</td>
+                                <td>
+                                    <button @onclick="() => ClearDebt(debt.Id)">Clear Debt</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             }
             else
             {
@@ -111,6 +125,6 @@
     private void Logout()
     {
         // Handle logout
-        NavigationManager.NavigateTo("/login");
+        NavigationManager.NavigateTo("/");
     }
 }

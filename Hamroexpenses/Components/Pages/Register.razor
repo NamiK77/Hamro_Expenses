@@ -4,24 +4,38 @@
 @inject UserService UserService
 @inject NavigationManager NavigationManager
 
-<h3>Register</h3>
+<!-- Include the external CSS file -->
+<head>
+    <link href="css/Register.css" rel="stylesheet" />
+</head>
 
-<div>
-    <input @bind="RegisterUsername" placeholder="Username" />
-    <input @bind="RegisterPassword" placeholder="Password" type="password" />
-    <input @bind="RegisterEmail" placeholder="Email" />
-    <button @onclick="HandleRegister">Register</button>
+<div class="register-container">
+    <div class="register-box">
+        <h3 class="register-title">Register</h3>
+        <div class="register-inputs">
+            <input @bind="RegisterUsername" class="input-field" placeholder="Username" />
+            <input @bind="RegisterPassword" class="input-field" placeholder="Password" type="password" />
+            <input @bind="RegisterEmail" class="input-field" placeholder="Email" />
+            <select @bind="RegisterCurrency" class="input-field">
+                <option value="">Select Currency</option>
+                <option value="USD">Dollar ($)</option>
+                <option value="NPR">NPR (Rs)</option>
+            </select>
+        </div>
+        <button class="register-button" @onclick="HandleRegister">Register</button>
+
+        @if (!string.IsNullOrEmpty(Message))
+        {
+            <p class="register-message">@Message</p>
+        }
+    </div>
 </div>
-
-@if (!string.IsNullOrEmpty(Message))
-{
-        <p>@Message</p>
-}
 
 @code {
     private string RegisterUsername = "";
     private string RegisterPassword = "";
     private string RegisterEmail = "";
+    private string RegisterCurrency = "";
     private string Message = "";
 
     private List<User> Users = new();
@@ -49,13 +63,14 @@
             {
                 Username = RegisterUsername,
                 Password = UserService.HashPassword(RegisterPassword),
-                Email = RegisterEmail
+                Email = RegisterEmail,
+                Currency = RegisterCurrency
             };
 
         Users.Add(newUser);
         UserService.SaveUsers(Users);
 
         Message = "Registration successful. Redirecting to login...";
-        Task.Delay(2000).ContinueWith(_ => NavigationManager.NavigateTo("/login"));
+        Task.Delay(2000).ContinueWith(_ => NavigationManager.NavigateTo("/"));
     }
 }

@@ -4,6 +4,7 @@ body {
     margin: 0;
     padding: 0;
     background-color: #f0f4f8;
+    overflow: hidden; /* Prevent full page scrolling */
 }
 
 /* Dashboard Container */
@@ -69,7 +70,7 @@ body {
     font-size: 1rem;
     cursor: pointer;
     transition: background 0.3s ease;
-    margin-top: 20px;
+    margin-top: auto; /* Push button to the bottom */
 }
 
     .logout-btn:hover {
@@ -84,6 +85,7 @@ body {
     box-shadow: -3px 0 10px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
     margin-left: 20px;
+    overflow-y: auto; /* Enable scrolling for content area */
 }
 
     .content-area h3 {
@@ -179,59 +181,11 @@ body {
             background-color: rgb(252, 70, 107);
         }
 
-/* Insufficient Funds Popup */
-.popup {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.popup-content {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    width: 300px;
-    text-align: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.popup h4 {
-    font-size: 1.5rem;
-    color: rgb(252, 70, 107);
-    margin-bottom: 20px;
-}
-
-.popup p {
-    font-size: 1.1rem;
-    color: #666;
-    margin-bottom: 30px;
-}
-
-.popup button {
-    background-color: rgb(63, 94, 251);
-    color: white;
-    font-size: 1rem;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-    .popup button:hover {
-        background-color: rgb(252, 70, 107);
-    }
-
 /* Expense List */
 .expense-list {
     margin-top: 40px;
+    max-height: 300px; /* Limit height */
+    overflow-y: auto; /* Enable scrolling */
 }
 
     .expense-list ul {
@@ -261,3 +215,116 @@ body {
         .expense-list button:hover {
             background-color: rgb(63, 94, 251);
         }
+
+/* Popup Styles */
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.popup-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    animation: popup-fade-in 0.3s ease-in-out;
+}
+
+    .popup-content h4 {
+        font-size: 1.5rem;
+        color: rgb(252, 70, 107);
+        margin-bottom: 20px;
+    }
+
+    .popup-content p {
+        font-size: 1.1rem;
+        color: #666;
+        margin-bottom: 30px;
+    }
+
+    .popup-content button {
+        background-color: rgb(63, 94, 251);
+        color: white;
+        font-size: 1rem;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+        .popup-content button:hover {
+            background-color: rgb(252, 70, 107);
+        }
+
+/* Table Styling */
+.expenses-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+    .expenses-table th, .expenses-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    .expenses-table th {
+        background-color: #f4f4f4;
+    }
+
+    .expenses-table td {
+        background-color: #fff;
+    }
+
+    .expenses-table tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    .expenses-table button {
+        padding: 4px 8px;
+        font-size: 14px;
+        color: white;
+        background-color: red;
+        border: none;
+        cursor: pointer;
+    }
+
+        .expenses-table button:hover {
+            background-color: darkred;
+        }
+
+.clear-debts-section {
+    margin-top: 20px;
+}
+
+    .clear-debts-section h4 {
+        color: #333;
+    }
+
+    .clear-debts-section p {
+        color: #555;
+    }
+
+/* Animation */
+@keyframes popup-fade-in {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

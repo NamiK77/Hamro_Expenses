@@ -1,5 +1,6 @@
 ﻿using Hamroexpenses.Models;
 using System.Text.Json;
+using System.Linq;
 
 namespace Hamroexpenses.Services
 {
@@ -73,24 +74,33 @@ namespace Hamroexpenses.Services
             }
         }
 
+        public List<Income> GetHighestIncome(int count = 5)
+        {
+            return _incomes.OrderByDescending(i => i.Amount).Take(count).ToList();
+        }
+
+        public List<Income> GetLowestIncome(int count = 5)
+        {
+            return _incomes.OrderBy(i => i.Amount).Take(count).ToList();
+        }
+
         // Deduct income after clearing a debt
         public void DeductIncome(decimal amount)
         {
             // Ensure the amount is greater than zero before deducting
             if (amount <= 0) return;
 
-            // Deduct the amount from the total income
+            // Get the total income
             var totalIncome = _incomes.Sum(i => i.Amount);
-            totalIncome -= amount;
 
-            // Now, update the income list (we'll reduce the total income proportionally)
-            // For simplicity, here we're just adjusting all incomes evenly.
-            // You may need to implement more sophisticated logic based on your business logic.
+            // Ensure the amount does not exceed the total income
+            if (amount > totalIncome) amount = totalIncome;
+
+            // Proportionally deduct the amount from each income entry
             foreach (var income in _incomes)
             {
-                // Adjust the income amounts proportionally (optional)
-                // Adjust each income entry by reducing the same percentage across all records.
-                income.Amount -= amount / _incomes.Count;
+                var proportion = income.Amount / totalIncome;
+                income.Amount -= amount * proportion;
             }
 
             SaveIncomes(); // Save the updated incomes

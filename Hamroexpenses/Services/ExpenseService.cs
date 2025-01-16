@@ -88,5 +88,17 @@ namespace Hamroexpenses.Services
                 Console.WriteLine($"Error deleting expense: {ex.Message}");
             }
         }
+
+        // Method to get the highest expenses
+        public List<Expense> GetHighestExpense(int count = 5)
+        {
+            return _expenses.OrderByDescending(e => e.Amount).Take(count).ToList();
+        }
+
+        // Method to get the lowest expenses
+        public List<Expense> GetLowestExpense(int count = 5)
+        {
+            return _expenses.OrderBy(e => e.Amount).Take(count).ToList();
+        }
     }
 }

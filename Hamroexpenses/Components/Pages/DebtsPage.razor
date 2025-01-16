@@ -15,12 +15,12 @@
         <div class="sidebar-header">
             <h2>Hamro Expenses</h2>
         </div>
-       <ul>
+        <ul>
             <li><NavLink href="/dashboard" class="nav-link" Match="NavLinkMatch.All">Home</NavLink></li>
             <li><NavLink href="/dashboard/income" class="nav-link">Income</NavLink></li>
             <li><NavLink href="/dashboard/expenses" class="nav-link">Expenses</NavLink></li>
             <li><NavLink href="/dashboard/debts" class="nav-link">Debts</NavLink></li>
-            <li><NavLink href="/dashboard/clear-debts" class="nav-link">Clear Debts</NavLink></li> <!-- Add link for clearing debts -->
+            <li><NavLink href="/dashboard/clear-debts" class="nav-link">Clear Debts</NavLink></li>
             <li><NavLink href="/dashboard/transactions" class="nav-link">Transaction</NavLink></li>
             <li><button class="btn logout-btn" @onclick="Logout">Logout</button></li>
         </ul>
@@ -31,6 +31,7 @@
         <h3>Debt Management</h3>
         <p>Track and manage your debts, including clearing pending debts.</p>
 
+        <!-- Add Debt Form -->
         <div class="debt-form">
             <h4>Add New Debt</h4>
             <div>
@@ -45,26 +46,74 @@
                 <label for="debt-category">Category</label>
                 <input id="debt-category" type="text" @bind="NewDebt.Category" placeholder="Enter category" />
             </div>
+            <div>
+                <label for="debt-date">Date</label>
+                <input id="debt-date" type="date" @bind="NewDebt.Date" />
+            </div>
+            <div>
+                <label for="debt-tags">Tags (comma-separated)</label>
+                <input id="debt-tags" type="text" @bind="TagsInput" placeholder="Enter tags" />
+            </div>
+            <div>
+                <label for="debt-note">Note</label>
+                <input id="debt-note" type="text" @bind="NewDebt.Note" placeholder="Enter a note" />
+            </div>
             <button class="add-debt-btn" @onclick="AddDebt">Add Debt</button>
         </div>
 
+        <!-- Success Popup -->
+        @if (ShowDebtAddedPopup)
+        {
+            <div class="popup">
+                <div class="popup-content">
+                    <h4>Debt Successfully Added!</h4>
+                    <p>Your debt entry has been recorded.</p>
+                    <button class="btn close-btn" @onclick="CloseDebtPopup">Close</button>
+                </div>
+            </div>
+        }
+
+        <!-- Debts List -->
         <div class="debt-list">
             <h4>Debts List</h4>
-            <ul>
-                @foreach (var debt in Debts)
-                {
-                        <li>
-                            <strong>@debt.Description:</strong> @debt.Amount.ToString("C") (Category: @debt.Category, Cleared: @(debt.IsCleared ? "Yes" : "No"))
-                        @if (!debt.IsCleared)
-                        {
+            <table class="debts-table">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Amount</th>
+                        <th>Category</th>
+                        <th>Date</th>
+                        <th>Tags</th>
+                        <th>Note</th>
+                        <th>Cleared</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var debt in Debts)
+                    {
+                        <tr>
+                            <td>@debt.Description</td>
+                            <td>@debt.Amount.ToString("C")</td>
+                            <td>@debt.Category</td>
+                            <td>@debt.Date.ToShortDateString()</td>
+                            <td>@string.Join(", ", debt.Tags)</td>
+                            <td>@debt.Note</td>
+                            <td>@(debt.IsCleared ? "Yes" : "No")</td>
+                            <td>
+                                @if (!debt.IsCleared)
+                                {
                                     <button @onclick="() => ClearDebt(debt.Id, debt.Amount)">Mark as Cleared</button>
-                        }
-                            <button @onclick="() => DeleteDebt(debt.Id)">Delete</button>
-                        </li>
-                }
-            </ul>
+                                }
+                                <button @onclick="() => DeleteDebt(debt.Id)">Delete</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
 
+        <!-- Total Outstanding Debt -->
         <div class="total-debt">
             <h4>Total Outstanding Debt: <span>@TotalDebt.ToString("C")</span></h4>
         </div>
@@ -75,6 +124,8 @@
     private List<Debt> Debts = new();
     private Debt NewDebt = new();
     private decimal TotalDebt = 0;
+    private bool ShowDebtAddedPopup = false;
+    private string TagsInput = string.Empty;
 
     protected override void OnInitialized()
     {
@@ -86,11 +137,26 @@
     {
         if (!string.IsNullOrEmpty(NewDebt.Description) && NewDebt.Amount > 0)
         {
+            if (NewDebt.Date == default)
+            {
+                NewDebt.Date = DateTime.Now; // Set to current date if not provided
+            }
+
+            NewDebt.Tags = TagsInput.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(t => t.Trim()).ToList();
             DebtService.AddDebt(NewDebt);
             Debts = DebtService.GetAllDebts();
             CalculateTotalDebt();
             NewDebt = new();
+            TagsInput = string.Empty;
+
+            // Show the success popup
+            ShowDebtAddedPopup = true;
         }
+    }
+
+    private void CloseDebtPopup()
+    {
+        ShowDebtAddedPopup = false;
     }
 
     private void ClearDebt(int id, decimal debtAmount)
@@ -123,6 +189,6 @@
 
     private void Logout()
     {
-        NavigationManager.NavigateTo("/login");
+        NavigationManager.NavigateTo("/");
     }
 }

@@ -22,7 +22,7 @@
             <li><NavLink href="/dashboard/income" class="nav-link">Income</NavLink></li>
             <li><NavLink href="/dashboard/expenses" class="nav-link">Expenses</NavLink></li>
             <li><NavLink href="/dashboard/debts" class="nav-link">Debts</NavLink></li>
-            <li><NavLink href="/dashboard/clear-debts" class="nav-link">Clear Debts</NavLink></li> <!-- Add link for clearing debts -->
+            <li><NavLink href="/dashboard/clear-debts" class="nav-link">Clear Debts</NavLink></li>
             <li><NavLink href="/dashboard/transactions" class="nav-link">Transaction</NavLink></li>
             <li><button class="btn logout-btn" @onclick="Logout">Logout</button></li>
         </ul>
@@ -59,10 +59,172 @@
                 <p>@ClearedDebt.ToString("C")</p>
             </div>
         </div>
+
+        <!-- Title for Highest and Lowest Transactions Section -->
+        <h3 class="section-title">
+            <span class="scrolling-text">Highest and Lowest Transactions</span>
+        </h3>
+
+
+        <!-- Highest and Lowest Income Section -->
+        <div class="table-container">
+            <h4>Highest Income</h4>
+            <p>This table lists the top income entries based on their amount, including their descriptions and unique IDs.</p>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var income in IncomeService.GetHighestIncome(CurrentPage))
+                    {
+                        <tr>
+                            <td>@income.Id</td>
+                            <td>@income.Description</td>
+                            <td>@income.Amount.ToString("C")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <button class="btn load-more-btn" @onclick="LoadMoreIncome">Load More</button>
+        </div>
+
+        <div class="table-container">
+            <h4>Lowest Income</h4>
+            <p>This table displays the lowest income records, allowing you to track minimal income transactions.</p>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var income in IncomeService.GetLowestIncome(CurrentPage))
+                    {
+                        <tr>
+                            <td>@income.Id</td>
+                            <td>@income.Description</td>
+                            <td>@income.Amount.ToString("C")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <button class="btn load-more-btn" @onclick="LoadMoreIncome">Load More</button>
+        </div>
+
+        <!-- Highest and Lowest Expenses Section -->
+        <div class="table-container">
+            <h4>Highest Expense</h4>
+            <p>Below is a list of the highest expenses recorded, including detailed descriptions and their amounts.</p>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var expense in ExpenseService.GetHighestExpense(CurrentPage))
+                    {
+                        <tr>
+                            <td>@expense.Id</td>
+                            <td>@expense.Description</td>
+                            <td>@expense.Amount.ToString("C")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <button class="btn load-more-btn" @onclick="LoadMoreExpense">Load More</button>
+        </div>
+
+        <div class="table-container">
+            <h4>Lowest Expense</h4>
+            <p>This table highlights the lowest expenses, helping you identify small expenditures easily.</p>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var expense in ExpenseService.GetLowestExpense(CurrentPage))
+                    {
+                        <tr>
+                            <td>@expense.Id</td>
+                            <td>@expense.Description</td>
+                            <td>@expense.Amount.ToString("C")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <button class="btn load-more-btn" @onclick="LoadMoreExpense">Load More</button>
+        </div>
+
+        <!-- Highest and Lowest Debts Section -->
+        <div class="table-container">
+            <h4>Highest Debt</h4>
+            <p>Review the highest recorded debts in this table, sorted by their amounts and descriptions.</p>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var debt in DebtService.GetHighestDebt(CurrentPage))
+                    {
+                        <tr>
+                            <td>@debt.Id</td>
+                            <td>@debt.Description</td>
+                            <td>@debt.Amount.ToString("C")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <button class="btn load-more-btn" @onclick="LoadMoreDebt">Load More</button>
+        </div>
+
+        <div class="table-container">
+            <h4>Lowest Debt</h4>
+            <p>This table lists the debts with the smallest amounts, making it easy to track minor obligations.</p>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var debt in DebtService.GetLowestDebt(CurrentPage))
+                    {
+                        <tr>
+                            <td>@debt.Id</td>
+                            <td>@debt.Description</td>
+                            <td>@debt.Amount.ToString("C")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <button class="btn load-more-btn" @onclick="LoadMoreDebt">Load More</button>
+        </div>
+
     </div>
 </div>
 
 @code {
+    private int CurrentPage = 1;
+
     private decimal TotalIncome = 0;
     private decimal TotalExpenses = 0;
     private decimal RemainingBalance = 0;
@@ -74,11 +236,13 @@
     {
         try
         {
-            // Load financial data on initialization
-            TotalIncome = IncomeService.GetAllIncomes().Sum(i => i.Amount);
-            TotalExpenses = ExpenseService.GetAllExpenses().Sum(e => e.Amount);
-
+            var incomes = IncomeService.GetAllIncomes();
+            var expenses = ExpenseService.GetAllExpenses();
             var debts = DebtService.GetAllDebts();
+
+            TotalIncome = incomes.Sum(i => i.Amount);
+            TotalExpenses = expenses.Sum(e => e.Amount);
+
             TotalDebt = debts.Sum(d => d.Amount);
             PendingDebt = debts.Where(d => !d.IsCleared).Sum(d => d.Amount);
             ClearedDebt = debts.Where(d => d.IsCleared).Sum(d => d.Amount);
@@ -91,9 +255,24 @@
         }
     }
 
+    private void LoadMoreIncome()
+    {
+        CurrentPage++;
+    }
+
+    private void LoadMoreExpense()
+    {
+        CurrentPage++;
+    }
+
+    private void LoadMoreDebt()
+    {
+        CurrentPage++;
+    }
+
     private void Logout()
     {
         UserService.Logout();  // Clear the current user
-        NavigationManager.NavigateTo("/login");  // Redirect to login page
+        NavigationManager.NavigateTo("/");  // Redirect to login page
     }
 }

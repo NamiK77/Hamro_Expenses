@@ -12,6 +12,7 @@ body {
     height: 100vh;
     flex-direction: row;
     box-sizing: border-box;
+    overflow: hidden;
 }
 
 /* Sidebar Styles */
@@ -24,6 +25,9 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    position: fixed;
+    height: 100%;
+    overflow-y: auto;
 }
 
 .sidebar-header h2 {
@@ -58,7 +62,6 @@ body {
         background-color: rgb(252, 70, 107);
     }
 
-/* Sidebar Buttons */
 .logout-btn {
     width: 100%;
     padding: 12px;
@@ -83,7 +86,9 @@ body {
     background-color: #ffffff;
     box-shadow: -3px 0 10px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
-    margin-left: 20px;
+    margin-left: 270px; /* Adjusted for fixed sidebar */
+    overflow-y: auto;
+    height: 100vh;
 }
 
     .content-area h3 {
@@ -97,6 +102,55 @@ body {
         color: #666;
         margin-bottom: 40px;
     }
+
+/* Styling for the section title */
+.section-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #a685d4; /* Light purple */
+    text-align: center;
+    margin: 20px 0;
+    overflow: hidden;
+    position: relative;
+    white-space: nowrap;
+    line-height: 1.9;
+    animation: glow-colors 3s infinite alternate; /* Glow animation */
+}
+
+/* Glowing Colors Animation */
+@keyframes glow-colors {
+    0% {
+        color: #a685d4;
+        
+    }
+
+    50% {
+        color: #a685d4; /* Light blue */
+        
+    }
+
+    100% {
+        color: #a685d4; /* Light coral */
+        
+    }
+}
+
+/* Horizontal scrolling animation */
+.section-title .scrolling-text {
+    display: inline-block;
+    animation: scroll-horizontal 10s linear infinite;
+}
+
+/* Keyframes for horizontal scrolling */
+@keyframes scroll-horizontal {
+    0% {
+        transform: translateX(100%);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+}
 
 /* Dashboard Cards */
 .dashboard-cards {
@@ -125,3 +179,51 @@ body {
         font-weight: bold;
         color: rgb(63, 94, 251);
     }
+
+/* Tables */
+.table-container {
+    margin-top: 20px;
+    background-color: #f8f0fa; /* Light purple background */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+    padding: 10px;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1rem;
+    background-color: #f8f0fa; /* Light purple background */
+}
+
+    .data-table th,
+    .data-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+        color: #333; /* Darker text for readability */
+    }
+
+    .data-table th {
+        background-color: #a685d4; /* Deeper purple for headers */
+        color: white;
+        font-weight: bold;
+    }
+
+    .data-table tbody tr:hover {
+        background-color: #e6d6f2; /* Slightly lighter purple for hover */
+    }
+
+/* Conditional Table Styling */
+.highest-records {
+    background-color: #d4f4e7; /* Light green for highest records */
+    color: #22543d; /* Darker green text */
+    font-weight: bold;
+}
+
+.lowest-records {
+    background-color: #fce8e8; /* Light red for lowest records */
+    color: #a81c1c; /* Darker red text */
+    font-weight: bold;
+}

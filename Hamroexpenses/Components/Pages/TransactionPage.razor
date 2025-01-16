@@ -32,7 +32,7 @@
         <h3>Transactions</h3>
         <p>View, filter, sort, and search your financial transactions.</p>
 
-        <!-- Dropdown to Select Data Type -->
+        <!-- Filter Section -->
         <div class="filter-section">
             <label for="data-type">Select Data Type:</label>
             <select id="data-type" @onchange="LoadData">
@@ -42,17 +42,14 @@
                 <option value="Debts">Debts</option>
             </select>
 
-            <!-- Search Bar -->
             <input type="text" placeholder="Search by title..." @bind="SearchTerm" @oninput="ApplyFilters" />
 
-            <!-- Date Range Filter -->
             <label for="start-date">Start Date:</label>
             <input id="start-date" type="date" @bind="StartDate" />
 
             <label for="end-date">End Date:</label>
             <input id="end-date" type="date" @bind="EndDate" />
 
-            <!-- Sort Dropdown -->
             <label for="sort-by">Sort By:</label>
             <select id="sort-by" @onchange="SortData">
                 <option value="">-- Select --</option>
@@ -62,22 +59,43 @@
             </select>
         </div>
 
-        <!-- Transactions List -->
-        <div class="transactions-list">
+        <!-- Transactions Table -->
+        <div class="transactions-table-container">
             <h4>Filtered Transactions</h4>
-            <ul>
-                @foreach (var transaction in FilteredTransactions)
-                {
-                    <li>
-                        <strong>@transaction.Title:</strong> @transaction.Amount.ToString("C")
-                        (Category: @transaction.Category,
-                        @if (transaction.Date != null)
+            <table class="transactions-table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Amount</th>
+                        <th>Category</th>
+                        <th>Date</th>
+                        <th>Tags</th>
+                        <th>Note</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (FilteredTransactions.Count > 0)
+                    {
+                        @foreach (var transaction in FilteredTransactions)
                         {
-                            <text>Date: @transaction.Date.Value.ToShortDateString()</text>
-                        })
-                    </li>
-                }
-            </ul>
+                            <tr>
+                                <td>@transaction.Title</td>
+                                <td>@transaction.Amount.ToString("C")</td>
+                                <td>@transaction.Category</td>
+                                <td>@(transaction.Date?.ToShortDateString() ?? "N/A")</td>
+                                <td>@string.Join(", ", transaction.Tags)</td>
+                                <td>@transaction.Note</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="no-data">No transactions found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -169,7 +187,7 @@
 
     private void Logout()
     {
-        NavigationManager.NavigateTo("/login");
+        NavigationManager.NavigateTo("/");
     }
 
     public class Transaction
@@ -178,7 +196,7 @@
         public decimal Amount { get; set; }
         public string Category { get; set; } = string.Empty;
         public DateTime? Date { get; set; }
-        public List<string> Tags { get; set; } = new();  // Default empty list
+        public List<string> Tags { get; set; } = new();
         public string Note { get; set; } = string.Empty;
     }
 }

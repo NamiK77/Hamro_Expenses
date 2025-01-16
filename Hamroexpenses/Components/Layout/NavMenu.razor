@@ -1,3 +1,8 @@
-﻿<p>
-    <a href="/login">Login</a> | <a href="/register">Register</a>
-</p>
+﻿@inject NavigationManager NavigationManager
+
+@if (!NavigationManager.Uri.Contains("login") && !NavigationManager.Uri.Contains("register"))
+{
+    <p>
+        <a href="/login">Login</a> | <a href="/register">Register</a>
+    </p>
+}

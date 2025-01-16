@@ -96,5 +96,17 @@ namespace Hamroexpenses.Services
             var json = JsonSerializer.Serialize(debts, new JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(FilePath, json);
         }
+
+        // Get highest debts
+        public List<Debt> GetHighestDebt(int count = 5)
+        {
+            return GetAllDebts().OrderByDescending(d => d.Amount).Take(count).ToList();
+        }
+
+        // Get lowest debts
+        public List<Debt> GetLowestDebt(int count = 5)
+        {
+            return GetAllDebts().OrderBy(d => d.Amount).Take(count).ToList();
+        }
     }
 }

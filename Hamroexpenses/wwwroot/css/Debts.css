@@ -416,3 +416,210 @@ button {
         font-size: 0.9rem;
     }
 }
+
+
+
+/* Style for debts container */
+.debts-container {
+    display: flex;
+    flex-direction: row;
+    padding: 20px;
+    background-color: #f8f9fa;
+}
+
+/* Sidebar style */
+.sidebar {
+    width: 250px;
+    background-color: #343a40;
+    color: white;
+    padding: 20px;
+    height: 100vh;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-header h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+.nav-link {
+    color: white;
+    text-decoration: none;
+    display: block;
+    margin-bottom: 10px;
+}
+
+    .nav-link:hover {
+        text-decoration: underline;
+    }
+
+/* Content area style */
+.content-area {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: #ffffff;
+    border-left: 1px solid #e0e0e0;
+}
+
+/* Debt form styling */
+.debt-form {
+    margin-bottom: 20px;
+}
+
+    .debt-form h4 {
+        margin-bottom: 10px;
+    }
+
+    .debt-form label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    .debt-form input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+    }
+
+/* Button styles */
+.add-debt-btn, .logout-btn, button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+.add-debt-btn {
+    background-color: #007bff;
+    color: white;
+}
+
+    .add-debt-btn:hover {
+        background-color: #0056b3;
+    }
+
+.logout-btn {
+    background-color: #dc3545;
+    color: white;
+}
+
+    .logout-btn:hover {
+        background-color: #c82333;
+    }
+
+button {
+    background-color: #6c757d;
+    color: white;
+}
+
+    button:hover {
+        background-color: #5a6268;
+    }
+
+/* Debts list table */
+.debts-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+    .debts-table th, .debts-table td {
+        border: 1px solid #dee2e6;
+        padding: 10px;
+        text-align: left;
+    }
+
+    .debts-table th {
+        background-color: #f8f9fa;
+    }
+
+    .debts-table tr:hover {
+        background-color: #f1f3f5;
+    }
+
+/* Total debt section */
+.total-debt h4 {
+    font-size: 18px;
+}
+
+.total-debt span {
+    font-weight: bold;
+}
+
+
+
+/* Popup styles */
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999; /* Ensure it appears above other elements */
+}
+
+.popup-content {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 90%;
+    max-width: 400px; /* Limit max size */
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+    .popup-content h4 {
+        font-size: 1.5em;
+        margin-bottom: 10px;
+        color: #28a745; /* Success green */
+    }
+
+    .popup-content p {
+        font-size: 1em;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .popup-content .btn {
+        padding: 10px 20px;
+        background-color: #007bff; /* Primary blue */
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.2s ease-in-out;
+    }
+
+        .popup-content .btn:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+
+.close-btn {
+    background-color: #dc3545; /* Danger red */
+}
+
+    .close-btn:hover {
+        background-color: #c82333; /* Darker red on hover */
+    }
+
+/* Fade-in animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

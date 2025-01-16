@@ -21,8 +21,8 @@
             <li><NavLink href="/dashboard/income" class="nav-link">Income</NavLink></li>
             <li><NavLink href="/dashboard/expenses" class="nav-link">Expenses</NavLink></li>
             <li><NavLink href="/dashboard/debts" class="nav-link">Debts</NavLink></li>
-            <li><NavLink href="/dashboard/clear-debts" class="nav-link">Clear Debts</NavLink></li> <!-- Add link for clearing debts -->
-            <li><NavLink href="/dashboard/transactions" class="nav-link">Transaction</NavLink></li>
+            <li><NavLink href="/dashboard/clear-debts" class="nav-link">Clear Debts</NavLink></li>
+            <li><NavLink href="/dashboard/transactions" class="nav-link">Transactions</NavLink></li>
             <li><button class="btn logout-btn" @onclick="Logout">Logout</button></li>
         </ul>
     </div>
@@ -30,17 +30,18 @@
     <!-- Main Content Area -->
     <div class="content-area">
         <h3>Income Management</h3>
-        <p>Track and manage your income by adding descriptions, dates, amounts, and categories.</p>
+        <p>Track and manage your income by adding descriptions, dates, amounts, categories, tags, and notes.</p>
 
+        <!-- Add Income Form -->
         <div class="income-form">
             <h4>Add New Income</h4>
             <div>
                 <label for="income-description">Description</label>
-                <input id="income-description" type="text" @bind="NewIncome.Description" placeholder="Enter description" />
+                <input id="income-description" type="text" @bind="NewIncome.Description" placeholder="Enter description" required />
             </div>
             <div>
                 <label for="income-amount">Amount ($)</label>
-                <input id="income-amount" type="number" @bind="NewIncome.Amount" placeholder="Enter amount" />
+                <input id="income-amount" type="number" @bind="NewIncome.Amount" placeholder="Enter amount" required />
             </div>
             <div>
                 <label for="income-date">Date</label>
@@ -48,61 +49,93 @@
             </div>
             <div>
                 <label for="income-category">Category</label>
-                <input id="income-category" type="text" @bind="NewIncome.Category" placeholder="Enter category" />
+                <input id="income-category" type="text" @bind="NewIncome.Category" placeholder="Enter category" required />
+            </div>
+            <div>
+                <label for="income-tags">Tags (comma-separated)</label>
+                <input id="income-tags" type="text" @bind="TagsInput" placeholder="Enter tags" />
+            </div>
+            <div>
+                <label for="income-note">Note</label>
+                <input id="income-note" type="text" @bind="NewIncome.Note" placeholder="Enter a note" />
             </div>
             <button class="add-income-btn" @onclick="AddIncome">Add Income</button>
         </div>
 
+        <!-- Income Summary -->
         <div class="income-summary">
             <h4>Total Income: <span>@TotalIncome.ToString("C")</span></h4>
         </div>
 
+        <!-- Income List in Tabular Form -->
         <div class="income-list">
             <h4>Income Entries</h4>
-            <ul>
-                @foreach (var income in Incomes)
-                {
-                        <li>
-                            <strong>@income.Description:</strong> @income.Amount.ToString("C") on @income.Date.ToShortDateString()
-                            <span>(Category: @income.Category)</span>
-                            <button @onclick="() => DeleteIncome(income.Id)">Delete</button>
-                        </li>
-                }
-            </ul>
-        </div>
-
-        <!-- Clear Debts Button -->
-        <div class="clear-debts-section">
-            <h4>Clear Debts</h4>
-            <button class="clear-debt-btn" @onclick="NavigateToClearDebtsPage">Clear Debts</button>
+            @if (Incomes.Count > 0)
+            {
+                <table class="income-table">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            <th>Category</th>
+                            <th>Tags</th>
+                            <th>Note</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var income in Incomes)
+                        {
+                            <tr>
+                                <td>@income.Description</td>
+                                <td>@income.Amount.ToString("C")</td>
+                                <td>@income.Date.ToShortDateString()</td>
+                                <td>@income.Category</td>
+                                <td>@string.Join(", ", income.Tags)</td>
+                                <td>@income.Note</td>
+                                <td>
+                                    <button class="delete-btn" @onclick="() => DeleteIncome(income.Id)">Delete</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p>No income entries found.</p>
+            }
         </div>
     </div>
 </div>
 
-<!-- Popup for Debt Cleared Confirmation -->
-@if (ShowDebtClearedPopup)
+<!-- Popup for Income Added Confirmation -->
+@if (ShowIncomeAddedPopup)
 {
-        <div class="popup">
-            <div class="popup-content">
-                <h4>Debt Cleared Successfully!</h4>
-                <p>Your debt has been cleared successfully.</p>
-                <button @onclick="CloseDebtPopup">Close</button>
-            </div>
+    <div class="popup">
+        <div class="popup-content">
+            <h4>Income Successfully Added!</h4>
+            <p>Your income entry has been recorded.</p>
+            <button class="btn close-btn" @onclick="CloseIncomePopup">Close</button>
         </div>
+    </div>
 }
 
 @code {
     private List<Income> Incomes = new();
     private Income NewIncome = new() { Date = DateTime.Now };
     private decimal TotalIncome = 0;
-    private bool ShowDebtClearedPopup = false;
-
-    // Debt model
-    private Debt Debt = new();
+    private bool ShowIncomeAddedPopup = false;
+    private string TagsInput = string.Empty;
 
     protected override void OnInitialized()
     {
-        // Load income data on initialization
+        LoadIncomeData();
+    }
+
+    private void LoadIncomeData()
+    {
         Incomes = IncomeService.GetAllIncomes();
         CalculateTotalIncome();
     }
@@ -116,34 +149,29 @@
     {
         if (!string.IsNullOrEmpty(NewIncome.Description) && NewIncome.Amount > 0 && !string.IsNullOrEmpty(NewIncome.Category))
         {
+            NewIncome.Tags = TagsInput.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(t => t.Trim()).ToList();
             IncomeService.AddIncome(NewIncome);
-            Incomes = IncomeService.GetAllIncomes();
-            CalculateTotalIncome();
-            NewIncome = new() { Date = DateTime.Now }; // Reset the form
+            LoadIncomeData();
+            NewIncome = new() { Date = DateTime.Now }; // Reset form
+            TagsInput = string.Empty;
+            ShowIncomeAddedPopup = true; // Show success popup
         }
+    }
+
+    private void CloseIncomePopup()
+    {
+        ShowIncomeAddedPopup = false; // Close the popup
     }
 
     private void DeleteIncome(int id)
     {
         IncomeService.DeleteIncome(id);
-        Incomes = IncomeService.GetAllIncomes();
-        CalculateTotalIncome();
-    }
-
-    private void NavigateToClearDebtsPage()
-    {
-        // Navigate to the Clear Debts page
-        NavigationManager.NavigateTo("/dashboard/clear-debts");
-    }
-
-    private void CloseDebtPopup()
-    {
-        ShowDebtClearedPopup = false;
+        LoadIncomeData();
     }
 
     private void Logout()
     {
-        UserService.Logout(); // Clear the current user
-        NavigationManager.NavigateTo("/login"); // Redirect to login page
+        UserService.Logout();
+        NavigationManager.NavigateTo("/");
     }
 }
