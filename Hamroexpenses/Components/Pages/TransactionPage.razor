@@ -4,7 +4,9 @@
 @inject IncomeService IncomeService
 @inject ExpenseService ExpenseService
 @inject DebtService DebtService
+@inject TransactionService TransactionService
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
 
 <head>
     <link href="css/Transaction.css" rel="stylesheet" />
@@ -58,6 +60,9 @@
                 <option value="Category">Category</option>
             </select>
         </div>
+
+        <!-- Download Button -->
+        <button class="btn download-btn" @onclick="DownloadTransactions">Download Transactions</button>
 
         <!-- Transactions Table -->
         <div class="transactions-table-container">
@@ -114,7 +119,6 @@
         SelectedType = e.Value?.ToString() ?? string.Empty;
         AllTransactions.Clear();
 
-        // Fetch data based on the selected type
         if (SelectedType == "Income")
         {
             AllTransactions = IncomeService.GetAllIncomes()
@@ -136,7 +140,7 @@
                         Title = e.Description ?? string.Empty,
                         Amount = e.Amount,
                         Category = e.Category ?? string.Empty,
-                        Date = null, // No date for expenses
+                        Date = null,
                         Tags = e.Tags ?? new List<string>(),
                         Note = e.Note ?? string.Empty
                     }).ToList();
@@ -155,7 +159,7 @@
                     }).ToList();
         }
 
-        ApplyFilters(); // Apply filters and sorting
+        ApplyFilters();
     }
 
     private void ApplyFilters()
@@ -183,6 +187,20 @@
             "Category" => FilteredTransactions.OrderBy(t => t.Category).ToList(),
             _ => FilteredTransactions
         };
+    }
+
+    private async Task DownloadTransactions()
+    {
+        var jsonData = TransactionService.ExportTransactions();
+        var base64Data = Convert.ToBase64String(jsonData);
+
+        // Create a download link with a suggested filename (e.g., "Datadownload.json")
+        var downloadLink = $"data:application/json;charset=utf-8;base64,{base64Data}";
+        var fileName = "Datadownload.json";
+
+        // Open the file download in the browser (prompting user to save it with the file name)
+        var jsScript = $"var a = document.createElement('a'); a.href = '{downloadLink}'; a.download = '{fileName}'; a.click();";
+        await JSRuntime.InvokeVoidAsync("eval", jsScript);
     }
 
     private void Logout()

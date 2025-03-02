@@ -36,5 +36,15 @@ namespace Hamroexpenses.Services
         {
             return LoadTransactions();
         }
+
+        /// <summary>
+        /// Exports transactions as a byte array for download.
+        /// </summary>
+        public byte[] ExportTransactions()
+        {
+            var transactions = LoadTransactions();
+            var json = JsonSerializer.Serialize(transactions, new JsonSerializerOptions { WriteIndented = true });
+            return System.Text.Encoding.UTF8.GetBytes(json);
+        }
     }
 }

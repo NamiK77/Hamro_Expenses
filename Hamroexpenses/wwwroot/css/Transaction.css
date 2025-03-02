@@ -199,3 +199,28 @@ body {
         font-size: 14px;
         color: #2c3e50;
     }
+
+
+/* Download Button */
+.download-btn {
+    background-color: #28a745; /* Green background */
+    color: white; /* White text color */
+    padding: 10px 20px; /* Padding around the button */
+    font-size: 14px; /* Font size */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    margin-top: 20px; /* Space above the button */
+}
+
+    .download-btn:hover {
+        background-color: #218838; /* Darker green on hover */
+    }
+
+    .download-btn:active {
+        background-color: #1e7e34; /* Even darker green when clicked */
+    }
+
+    .download-btn:focus {
+        outline: none; /* Remove default outline on focus */
+    }

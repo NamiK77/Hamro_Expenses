@@ -3,6 +3,7 @@
 @using Hamroexpenses.Models
 @inject IncomeService IncomeService
 @inject ExpenseService ExpenseService
+@inject DebtService DebtService
 @inject UserService UserService
 @inject NavigationManager NavigationManager
 
@@ -128,6 +129,7 @@
     private Expense NewExpense = new() { Date = DateTime.Now }; // Initialize with today's date
     private decimal TotalIncome = 0;
     private decimal TotalExpenses = 0;
+    private decimal TotalDebt = 0;
     private decimal RemainingBalance = 0;
     private bool ShowInsufficientFundsPopup = false;
     private string TagsInput = string.Empty;
@@ -138,11 +140,17 @@
         {
             var incomes = IncomeService.GetAllIncomes();
             var expenses = ExpenseService.GetAllExpenses();
+            var debts = DebtService.GetAllDebts();
 
             TotalIncome = incomes.Sum(i => i.Amount);
             Expenses = expenses ?? new List<Expense>();
             TotalExpenses = Expenses.Sum(e => e.Amount);
-            RemainingBalance = TotalIncome - TotalExpenses;
+
+            // Calculate total debt (including pending debts)
+            TotalDebt = debts.Where(d => !d.IsCleared).Sum(d => d.Amount);
+
+            // Calculate remaining balance (Income + Pending Debts - Expenses)
+            RemainingBalance = TotalIncome + TotalDebt - TotalExpenses;
         }
         catch (Exception ex)
         {
@@ -176,7 +184,10 @@
             ExpenseService.AddExpense(NewExpense);
             Expenses = ExpenseService.GetAllExpenses();
             TotalExpenses = Expenses.Sum(e => e.Amount);
-            RemainingBalance = TotalIncome - TotalExpenses;
+
+            // Recalculate Remaining Balance
+            RemainingBalance = TotalIncome + TotalDebt - TotalExpenses;
+
             NewExpense = new Expense() { Date = DateTime.Now }; // Reset the form
             TagsInput = string.Empty;
         }
@@ -193,7 +204,9 @@
             ExpenseService.DeleteExpense(id);
             Expenses = ExpenseService.GetAllExpenses();
             TotalExpenses = Expenses.Sum(e => e.Amount);
-            RemainingBalance = TotalIncome - TotalExpenses;
+
+            // Recalculate Remaining Balance
+            RemainingBalance = TotalIncome + TotalDebt - TotalExpenses;
         }
         catch (Exception ex)
         {
